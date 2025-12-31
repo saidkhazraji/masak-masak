@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Tebak Kematangan Masakan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #f8c291, #e55039);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a5b1c2;
+            margin-bottom: 10px;
+        }
+
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .selection-panel, .cooking-panel {
+            flex: 1;
+            min-width: 300px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #f8c291;
+            border-bottom: 2px solid #e55039;
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            color: #e55039;
+        }
+
+        .food-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .food-option {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .food-option:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #e55039;
+        }
+
+        .food-option.selected {
+            background: rgba(229, 80, 57, 0.3);
+            border-color: #e55039;
+            box-shadow: 0 5px 15px rgba(229, 80, 57, 0.4);
+        }
+
+        .food-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #f8c291;
+        }
+
+        .food-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .cooking-time {
+            font-size: 0.9rem;
+            color: #a5b1c2;
+        }
+
+        .cooking-station {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pan-container {
+            position: relative;
+            width: 280px;
+            height: 180px;
+            margin: 0 auto 30px;
+        }
+
+        .pan {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #4a4a4a;
+            border-radius: 0 0 50% 50%;
+            box-shadow: inset 0 -10px 20px rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .food-in-pan {
+            position: absolute;
+            font-size: 4.5rem;
+            z-index: 2;
+            transition: all 0.5s ease;
+        }
+
+        .lid {
+            position: absolute;
+            width: 110%;
+            height: 70px;
+            background: #333;
+            border-radius: 50% 50% 0 0;
+            top: -35px;
+            left: -5%;
+            z-index: 3;
+            transition: transform 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .lid.closed {
+            transform: translateY(0);
+        }
+
+        .lid.open {
+            transform: translateY(-130px);
+        }
+
+        .lid-handle {
+            width: 40px;
+            height: 12px;
+            background: #555;
+            border-radius: 5px;
+            position: absolute;
+            top: 18px;
+        }
+
+        .target-display {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+            border: 2px solid #e55039;
+        }
+
+        .target-label {
+            font-size: 1.1rem;
+            color: #a5b1c2;
+            margin-bottom: 10px;
+        }
+
+        .target-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #2ecc71;
+            font-family: 'Courier New', monospace;
+        }
+
+        .target-unit {
+            font-size: 1.2rem;
+            color: #a5b1c2;
+            margin-left: 5px;
+        }
+
+        .rule-display {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .rule-box {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .rule-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .rule-text {
+            font-size: 1rem;
+            color: #a5b1c2;
+        }
+
+        .rule-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .rule-value.raw {
+            color: #3498db;
+        }
+
+        .rule-value.perfect {
+            color: #2ecc71;
+        }
+
+        .rule-value.burned {
+            color: #e74c3c;
+        }
+
+        .sound-indicator {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .indicator-title {
+            color: #f8c291;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sound-bars {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            height: 30px;
+            align-items: flex-end;
+            margin-top: 10px;
+        }
+
+        .sound-bar {
+            width: 12px;
+            background: #3498db;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 14px 28px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .start-btn {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .start-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+        }
+
+        .start-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .guess-btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+        }
+
+        .guess-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .guess-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .cooking-info {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .info-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #f8c291;
+        }
+
+        .info-detail {
+            font-size: 1rem;
+            color: #a5b1c2;
+            margin-top: 5px;
+        }
+
+        .rules-box {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            font-size: 0.9rem;
+            border-left: 4px solid #e55039;
+        }
+
+        .rules-box h4 {
+            color: #f8c291;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .rules-box ul {
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+
+        .rules-box li {
+            margin-bottom: 5px;
+            color: #a5b1c2;
+        }
+
+        .highlight {
+            color: #f8c291;
+            font-weight: bold;
+        }
+
+        .result-panel {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-title {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: #f8c291;
+        }
+
+        .result-desc {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            padding: 0 20px;
+        }
+
+        .result-detail {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 500px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px 0;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .result-label {
+            color: #a5b1c2;
+            font-size: 1.1rem;
+        }
+
+        .result-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .result-value.raw {
+            color: #3498db;
+        }
+
+        .result-value.perfect {
+            color: #2ecc71;
+        }
+
+        .result-value.burned {
+            color: #e74c3c;
+        }
+
+        .restart-btn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+            color: white;
+            margin: 10px auto 0;
+            padding: 14px 35px;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .restart-btn:active {
+            transform: scale(0.98);
+        }
+
+        .sound-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .sound-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .sound-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .instructions h3 {
+            color: #f8c291;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+            line-height: 1.8;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+            color: #a5b1c2;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #a5b1c2;
+            font-size: 0.9rem;
+        }
+
+        .time-range {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            font-size: 1.1rem;
+        }
+
+        .time-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .sound-toggle {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin: 10px auto;
+                display: block;
+            }
+            
+            .rule-display {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sound-toggle" id="sound-toggle">
+        <i class="fas fa-volume-up"></i>
+    </button>
+
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-utensils"></i> Game Tebak Detik Masakan</h1>
+            <p class="subtitle">Tebak waktu memasak dalam DETIK saja! Tidak ada menit!</p>
+        </header>
+
+        <div class="game-area">
+            <div class="selection-panel">
+                <h2 class="panel-title"><i class="fas fa-list"></i> Pilih Makanan</h2>
+                <div class="food-options">
+                    <!-- Food options will be generated by JavaScript -->
+                </div>
+                
+                <div class="target-display">
+                    <div class="target-label">Target Waktu Matang</div>
+                    <div class="target-value" id="target-seconds">-</div>
+                    <div class="target-unit">detik</div>
+                </div>
+                
+                <div class="rules-box">
+                    <h4><i class="fas fa-rules"></i> Aturan Tebak (Detik Saja):</h4>
+                    <ul>
+                        <li><span class="highlight">MENTAH</span> → Detik Anda <span class="highlight">&lt; target detik</span></li>
+                        <li><span class="highlight">MATANG</span> → Detik Anda <span class="highlight">= target detik ± toleransi</span></li>
+                        <li><span class="highlight">GOSONG</span> → Detik Anda <span class="highlight">&gt; target detik + toleransi</span></li>
+                        <li>Toleransi: ±10 detik dari target</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="cooking-panel">
+                <h2 class="panel-title"><i class="fas fa-fire"></i> Dapur Memasak</h2>
+                <div class="cooking-station">
+                    <div class="pan-container">
+                        <div class="pan">
+                            <div class="food-in-pan" id="food-in-pan">
+                                <i class="fas fa-question"></i>
+                            </div>
+                            <div class="lid" id="lid">
+                                <div class="lid-handle"></div>
+                                <i class="fas fa-hand-paper"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-display">
+                        <div class="rule-box">
+                            <div class="rule-icon" style="color:#3498db;">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="rule-text">MENTAH jika</div>
+                            <div class="rule-value raw" id="raw-range">-</div>
+                        </div>
+                        
+                        <div class="rule-box">
+                            <div class="rule-icon" style="color:#2ecc71;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="rule-text">MATANG jika</div>
+                            <div class="rule-value perfect" id="perfect-range">-</div>
+                        </div>
+                        
+                        <div class="rule-box">
+                            <div class="rule-icon" style="color:#e74c3c;">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="rule-text">GOSONG jika</div>
+                            <div class="rule-value burned" id="burned-range">-</div>
+                        </div>
+                    </div>
+                    
+                    <div class="sound-indicator">
+                        <div class="indicator-title">
+                            <i class="fas fa-volume-up"></i> Indikator Suara Masak:
+                        </div>
+                        <div class="sound-bars" id="sound-bars">
+                            <!-- Sound bars will be generated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="time-range">
+                        <div class="time-item">Cepat</div>
+                        <i class="fas fa-arrow-right"></i>
+                        <div class="time-item">Sedang</div>
+                        <i class="fas fa-arrow-right"></i>
+                        <div class="time-item">Lama</div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button id="start-btn" class="start-btn">
+                            <i class="fas fa-play"></i> 
+                            <span>Mulai Memasak</span>
+                        </button>
+                        <button id="guess-btn" class="guess-btn" disabled>
+                            <i class="fas fa-check"></i> 
+                            <span>Stop & Tebak</span>
+                        </button>
+                    </div>
+                    
+                    <div class="cooking-info" id="cooking-info">
+                        <div class="info-text">Status: <span id="cooking-status">Pilih makanan untuk mulai memasak</span></div>
+                        <div class="info-detail">Wajan tertutup - tebak dengan suara!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-panel" id="result-panel">
+            <h2 class="result-title" id="result-title">Hasil Memasak</h2>
+            <div class="result-detail">
+                <div class="result-row">
+                    <div class="result-label">Makanan:</div>
+                    <div class="result-value" id="result-food">-</div>
+                </div>
+                <div class="result-row">
+                    <div class="result-label">Target matang:</div>
+                    <div class="result-value perfect" id="result-target">-</div>
+                </div>
+                <div class="result-row">
+                    <div class="result-label">Waktu Anda:</div>
+                    <div class="result-value" id="result-your-time">-</div>
+                </div>
+                <div class="result-row">
+                    <div class="result-label">Selisih:</div>
+                    <div class="result-value" id="result-difference">-</div>
+                </div>
+            </div>
+            <p class="result-desc" id="result-desc"></p>
+            <button class="restart-btn" id="restart-btn">
+                <i class="fas fa-redo"></i> Masak Lagi
+            </button>
+        </div>
+
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> Cara Bermain (DETIK SAJA):</h3>
+            <ol>
+                <li><strong>Pilih makanan</strong> - setiap makanan matang dalam DETIK berbeda</li>
+                <li>Lihat <strong>target waktu</strong> dalam detik</li>
+                <li>Klik <strong>"Mulai Memasak"</strong> - wajan tertutup</li>
+                <li><strong>Tidak ada timer yang terlihat!</strong> Hanya suara</li>
+                <li>Dengarkan <strong>intensitas suara memasak</strong> sebagai petunjuk</li>
+                <li>Semakin lama memasak → suara semakin keras & sering</li>
+                <li>Klik <strong>"Stop & Tebak"</strong> ketika Anda rasa sudah pas</li>
+                <li>Hasil berdasarkan <strong>perbandingan DETIK</strong>:
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li>Terlalu cepat = <span style="color:#3498db">MENTAH</span></li>
+                        <li>Pas (±10 detik) = <span style="color:#2ecc71">MATANG</span></li>
+                        <li>Terlalu lama = <span style="color:#e74c3c">GOSONG</span></li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <footer>
+        <p>Game Memasak &copy; 2023 | Tebak waktu dalam DETIK dengan suara!</p>
+    </footer>
+
+    <script>
+        // Data makanan dan waktu memasaknya (dalam DETIK saja)
+        const foods = [
+            { id: 1, name: "Telur", icon: "egg", cookTime: 45, color: "#FFD700" },        // 45 detik
+            { id: 2, name: "Ikan", icon: "fish", cookTime: 60, color: "#1E90FF" },        // 60 detik (1 menit)
+            { id: 3, name: "Ayam", icon: "drumstick-bite", cookTime: 90, color: "#FF6347" },    // 90 detik (1.5 menit)
+            { id: 4, name: "Daging Sapi", icon: "bone", cookTime: 120, color: "#8B4513" },      // 120 detik (2 menit)
+            { id: 5, name: "Daging Kambing", icon: "hamburger", cookTime: 150, color: "#A0522D" }  // 150 detik (2.5 menit)
+        ];
+
+        // Toleransi untuk "matang" (dalam detik)
+        const TOLERANCE = 10;
+
+        // Variabel game
+        let selectedFood = null;
+        let isCooking = false;
+        let cookingStartTime = 0;
+        let currentCookTime = 0;
+        let cookingInterval = null;
+        let soundEnabled = true;
+        let targetSeconds = 0;
+        let yourSeconds = 0;
+        
+        // Untuk visual sound bars
+        let soundBarsInterval = null;
+
+        // Elemen DOM
+        const foodOptionsContainer = document.querySelector('.food-options');
+        const foodInPan = document.getElementById('food-in-pan');
+        const lid = document.getElementById('lid');
+        const startBtn = document.getElementById('start-btn');
+        const guessBtn = document.getElementById('guess-btn');
+        const cookingStatus = document.getElementById('cooking-status');
+        const targetSecondsDisplay = document.getElementById('target-seconds');
+        const rawRangeDisplay = document.getElementById('raw-range');
+        const perfectRangeDisplay = document.getElementById('perfect-range');
+        const burnedRangeDisplay = document.getElementById('burned-range');
+        const soundBarsContainer = document.getElementById('sound-bars');
+        const resultPanel = document.getElementById('result-panel');
+        const resultTitle = document.getElementById('result-title');
+        const resultDesc = document.getElementById('result-desc');
+        const resultFood = document.getElementById('result-food');
+        const resultTarget = document.getElementById('result-target');
+        const resultYourTime = document.getElementById('result-your-time');
+        const resultDifference = document.getElementById('result-difference');
+        const restartBtn = document.getElementById('restart-btn');
+        const soundToggle = document.getElementById('sound-toggle');
+
+        // Icon mapping
+        const iconMap = {
+            egg: "fas fa-egg",
+            fish: "fas fa-fish",
+            "drumstick-bite": "fas fa-drumstick-bite",
+            bone: "fas fa-bone",
+            hamburger: "fas fa-hamburger"
+        };
+
+        // Sound effects
+        const sounds = {
+            start: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-cooking-in-a-pan-443.mp3'),
+            sizzle: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-cooking-sizzle-444.mp3'),
+            success: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3'),
+            fail: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3'),
+            lid: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-metal-hit-woosh-1493.mp3'),
+            bubble: new Audio('https://assets.mixkit.co/sfx/preview/mixkit-bubble-pop-up-alert-notification-2356.mp3')
+        };
+
+        // Preload sounds
+        Object.values(sounds).forEach(sound => {
+            sound.volume = 0.5;
+            sound.preload = 'auto';
+        });
+
+        // Inisialisasi sound bars visual
+        function initSoundBars() {
+            soundBarsContainer.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'sound-bar';
+                bar.style.height = '5px';
+                soundBarsContainer.appendChild(bar);
+            }
+        }
+
+        // Update sound bars visual berdasarkan progress
+        function updateSoundBars(progress) {
+            const bars = soundBarsContainer.querySelectorAll('.sound-bar');
+            const baseHeight = 5;
+            const maxHeight = 30;
+            
+            bars.forEach((bar, index) => {
+                // Hitung tinggi berdasarkan progress dan posisi bar
+                let height = baseHeight + (progress * maxHeight * 0.7);
+                
+                // Tambahkan variasi untuk efek visual lebih menarik
+                const variation = Math.sin(Date.now() / 200 + index) * 0.3 + 0.7;
+                height *= variation;
+                
+                // Batasi tinggi maksimum
+                height = Math.min(height, maxHeight);
+                
+                // Update tinggi dan warna
+                bar.style.height = `${height}px`;
+                
+                // Update warna berdasarkan progress
+                if (progress < 0.3) {
+                    bar.style.background = '#3498db'; // Biru (mentah)
+                } else if (progress < 0.7) {
+                    bar.style.background = '#f1c40f'; // Kuning (hampir matang)
+                } else {
+                    bar.style.background = '#e74c3c'; // Merah (matang/gosong)
+                }
+            });
+        }
+
+        // Inisialisasi pilihan makanan
+        function initFoodOptions() {
+            foodOptionsContainer.innerHTML = '';
+            
+            foods.forEach(food => {
+                const foodOption = document.createElement('div');
+                foodOption.className = 'food-option';
+                foodOption.dataset.id = food.id;
+                
+                foodOption.innerHTML = `
+                    <div class="food-icon">
+                        <i class="${iconMap[food.icon]}"></i>
+                    </div>
+                    <div class="food-name">${food.name}</div>
+                    <div class="cooking-time">${food.cookTime} detik</div>
+                `;
+                
+                foodOption.addEventListener('click', () => selectFood(food));
+                foodOption.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    selectFood(food);
+                });
+                
+                foodOptionsContainer.appendChild(foodOption);
+            });
+        }
+
+        // Pilih makanan
+        function selectFood(food) {
+            if (isCooking) return;
+            
+            selectedFood = food;
+            
+            // Set target detik
+            targetSeconds = food.cookTime;
+            
+            // Update UI pilihan makanan
+            document.querySelectorAll('.food-option').forEach(option => {
+                option.classList.remove('selected');
+                if (parseInt(option.dataset.id) === food.id) {
+                    option.classList.add('selected');
+                }
+            });
+            
+            // Update tampilan makanan di wajan
+            foodInPan.innerHTML = `<i class="${iconMap[food.icon]}"></i>`;
+            foodInPan.style.color = food.color;
+            
+            // Update status
+            cookingStatus.textContent = "Siap untuk dimasak";
+            cookingStatus.style.color = "#f8c291";
+            
+            // Update target detik display
+            targetSecondsDisplay.textContent = targetSeconds;
+            
+            // Update range displays
+            const rawMax = targetSeconds - TOLERANCE - 1;
+            const perfectMin = targetSeconds - TOLERANCE;
+            const perfectMax = targetSeconds + TOLERANCE;
+            const burnedMin = targetSeconds + TOLERANCE + 1;
+            
+            rawRangeDisplay.textContent = `≤ ${rawMax}s`;
+            perfectRangeDisplay.textContent = `${perfectMin}-${perfectMax}s`;
+            burnedRangeDisplay.textContent = `≥ ${burnedMin}s`;
+            
+            // Reset sound bars
+            initSoundBars();
+            
+            // Aktifkan tombol mulai memasak
+            startBtn.disabled = false;
+            startBtn.style.cursor = "pointer";
+            
+            // Reset hasil sebelumnya
+            resultPanel.style.display = 'none';
+            
+            // Reset your seconds
+            yourSeconds = 0;
+        }
+
+        // Mulai memasak
+        function startCooking() {
+            if (!selectedFood || isCooking) return;
+            
+            isCooking = true;
+            cookingStartTime = Date.now();
+            currentCookTime = 0;
+            yourSeconds = 0;
+            
+            // Tutup penutup wajan
+            lid.classList.remove('open');
+            lid.classList.add('closed');
+            
+            // Update status
+            cookingStatus.textContent = "Sedang memasak...";
+            cookingStatus.style.color = "#f1c40f";
+            
+            // Nonaktifkan tombol mulai dan aktifkan tombol tebak
+            startBtn.disabled = true;
+            startBtn.style.cursor = "not-allowed";
+            guessBtn.disabled = false;
+            guessBtn.style.cursor = "pointer";
+            
+            // Mainkan suara
+            if (soundEnabled) {
+                try {
+                    sounds.start.currentTime = 0;
+                    sounds.start.play().catch(e => console.log("Sound play error:", e));
+                    
+                    setTimeout(() => {
+                        sounds.sizzle.currentTime = 0;
+                        sounds.sizzle.loop = true;
+                        sounds.sizzle.play().catch(e => console.log("Sizzle sound error:", e));
+                    }, 500);
+                } catch (e) {
+                    console.log("Error playing sounds:", e);
+                }
+            }
+            
+            // Mulai proses memasak
+            cookingInterval = setInterval(updateCooking, 100);
+            
+            // Mulai animasi sound bars
+            if (soundBarsInterval) clearInterval(soundBarsInterval);
+            soundBarsInterval = setInterval(() => {
+                if (isCooking) {
+                    const progress = currentCookTime / selectedFood.cookTime;
+                    updateSoundBars(progress);
+                }
+            }, 100);
+        }
+
+        // Update proses memasak
+        function updateCooking() {
+            const now = Date.now();
+            currentCookTime = (now - cookingStartTime) / 1000; // Konversi ke detik
+            
+            // Update detik Anda
+            yourSeconds = Math.floor(currentCookTime);
+            
+            // Update suara berdasarkan progress
+            const progress = currentCookTime / selectedFood.cookTime;
+            
+            if (soundEnabled) {
+                try {
+                    // Atur volume sizzle berdasarkan progress
+                    if (sounds.sizzle) {
+                        // Volume naik seiring waktu: 0.3 - 0.8
+                        sounds.sizzle.volume = 0.3 + (progress * 0.5);
+                        
+                        // Playback rate juga naik: 0.8 - 1.5
+                        sounds.sizzle.playbackRate = 0.8 + (progress * 0.7);
+                    }
+                    
+                    // Mainkan bubble sound secara acak (lebih sering saat hampir matang)
+                    if (progress > 0.5) {
+                        const bubbleChance = 0.05 + (progress * 0.15);
+                        if (Math.random() < bubbleChance) {
+                            if (sounds.bubble) {
+                                sounds.bubble.currentTime = 0;
+                                sounds.bubble.volume = 0.2 + (progress * 0.4);
+                                sounds.bubble.playbackRate = 1.0 + (progress * 0.5);
+                                sounds.bubble.play().catch(e => console.log("Bubble sound error:", e));
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.log("Error updating sounds:", e);
+                }
+            }
+            
+            // Jika waktu memasak sudah melebihi 150% waktu yang dibutuhkan, otomatis gosong
+            if (currentCookTime >= selectedFood.cookTime * 1.5) {
+                endCooking('burned');
+            }
+        }
+
+        // Stop dan tebak
+        function guessCooking() {
+            if (!isCooking || !selectedFood) return;
+            
+            // Hitung selisih dengan target
+            const difference = yourSeconds - targetSeconds;
+            
+            // Tentukan hasil berdasarkan aturan dengan toleransi
+            if (yourSeconds < targetSeconds - TOLERANCE) {
+                endCooking('raw');
+            } else if (Math.abs(difference) <= TOLERANCE) {
+                endCooking('perfect');
+            } else {
+                endCooking('burned');
+            }
+        }
+
+        // Akhiri memasak
+        function endCooking(result) {
+            clearInterval(cookingInterval);
+            clearInterval(soundBarsInterval);
+            isCooking = false;
+            
+            // Hentikan suara sizzle
+            if (soundEnabled && sounds.sizzle) {
+                try {
+                    sounds.sizzle.pause();
+                    sounds.sizzle.currentTime = 0;
+                } catch (e) {
+                    console.log("Error stopping sizzle:", e);
+                }
+            }
+            
+            // Buka penutup wajan
+            lid.classList.remove('closed');
+            lid.classList.add('open');
+            
+            // Mainkan suara penutup
+            if (soundEnabled) {
+                try {
+                    sounds.lid.currentTime = 0;
+                    sounds.lid.play().catch(e => console.log("Lid sound error:", e));
+                } catch (e) {
+                    console.log("Error playing lid sound:", e);
+                }
+            }
+            
+            // Nonaktifkan tombol tebak
+            guessBtn.disabled = true;
+            guessBtn.style.cursor = "not-allowed";
+            
+            // Tampilkan hasil
+            showResult(result);
+        }
+
+        // Tampilkan hasil
+        function showResult(result) {
+            const difference = yourSeconds - targetSeconds;
+            const absDifference = Math.abs(difference);
+            
+            let title = "";
+            let description = "";
+            let color = "";
+            let differenceText = "";
+            
+            switch(result) {
+                case 'perfect':
+                    title = "Matang Sempurna! 🎉";
+                    if (difference === 0) {
+                        description = `Luar biasa! ${selectedFood.name} Anda matang tepat ${targetSeconds} detik. Tepat sekali!`;
+                        differenceText = "TEPAT 0 detik!";
+                    } else if (difference > 0) {
+                        description = `Bagus! ${selectedFood.name} Anda matang ${difference} detik lebih lama. Masih dalam toleransi!`;
+                        differenceText = `+${difference} detik`;
+                    } else {
+                        description = `Bagus! ${selectedFood.name} Anda matang ${absDifference} detik lebih cepat. Masih dalam toleransi!`;
+                        differenceText = `-${absDifference} detik`;
+                    }
+                    color = "#2ecc71";
+                    if (soundEnabled) {
+                        try {
+                            sounds.success.currentTime = 0;
+                            sounds.success.play().catch(e => console.log("Success sound error:", e));
+                        } catch (e) {
+                            console.log("Error playing success sound:", e);
+                        }
+                    }
+                    break;
+                    
+                case 'raw':
+                    title = "Masih Mentah! 😞";
+                    description = `${selectedFood.name} Anda masih mentah. Anda ${absDifference} detik terlalu cepat.`;
+                    color = "#3498db";
+                    differenceText = `-${absDifference} detik`;
+                    if (soundEnabled) {
+                        try {
+                            sounds.fail.currentTime = 0;
+                            sounds.fail.play().catch(e => console.log("Fail sound error:", e));
+                        } catch (e) {
+                            console.log("Error playing fail sound:", e);
+                        }
+                    }
+                    break;
+                    
+                case 'burned':
+                    title = "Gosong! 🔥";
+                    description = `${selectedFood.name} Anda gosong. Anda ${difference} detik terlalu lama.`;
+                    color = "#e74c3c";
+                    differenceText = `+${difference} detik`;
+                    if (soundEnabled) {
+                        try {
+                            sounds.fail.currentTime = 0;
+                            sounds.fail.play().catch(e => console.log("Fail sound error:", e));
+                        } catch (e) {
+                            console.log("Error playing fail sound:", e);
+                        }
+                    }
+                    break;
+            }
+            
+            // Update status
+            cookingStatus.textContent = result === 'perfect' ? "Matang Sempurna!" : 
+                                      result === 'raw' ? "Masih Mentah!" : "Gosong!";
+            cookingStatus.style.color = color;
+            
+            // Update tampilan makanan di wajan berdasarkan hasil
+            if (result === 'perfect') {
+                foodInPan.style.color = "#2ecc71";
+                foodInPan.style.transform = "scale(1.2)";
+                setTimeout(() => {
+                    foodInPan.style.transform = "scale(1)";
+                }, 500);
+            } else if (result === 'raw') {
+                foodInPan.style.color = "#3498db";
+                foodInPan.style.transform = "scale(0.8)";
+            } else {
+                foodInPan.style.color = "#e74c3c";
+                foodInPan.innerHTML = '<i class="fas fa-skull-crossbones"></i>';
+                foodInPan.style.transform = "scale(1.1)";
+            }
+            
+            // Update display hasil
+            resultFood.textContent = selectedFood.name;
+            resultTarget.textContent = `${targetSeconds} detik`;
+            resultYourTime.textContent = `${yourSeconds} detik`;
+            resultDifference.textContent = differenceText;
+            resultDifference.className = `result-value ${result}`;
+            
+            // Tampilkan panel hasil
+            resultTitle.textContent = title;
+            resultTitle.style.color = color;
+            resultDesc.textContent = description;
+            resultPanel.style.display = 'block';
+        }
+
+        // Reset game
+        function restartGame() {
+            // Reset variabel game
+            selectedFood = null;
+            isCooking = false;
+            cookingStartTime = 0;
+            currentCookTime = 0;
+            yourSeconds = 0;
+            
+            // Hentikan semua interval
+            clearInterval(cookingInterval);
+            clearInterval(soundBarsInterval);
+            
+            // Hentikan suara
+            Object.values(sounds).forEach(sound => {
+                try {
+                    if (sound) {
+                        sound.pause();
+                        sound.currentTime = 0;
+                        sound.playbackRate = 1.0;
+                    }
+                } catch (e) {
+                    console.log("Error stopping sound:", e);
+                }
+            });
+            
+            // Reset UI
+            document.querySelectorAll('.food-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            foodInPan.innerHTML = '<i class="fas fa-question"></i>';
+            foodInPan.style.color = "#f8c291";
+            foodInPan.style.transform = "scale(1)";
+            
+            lid.classList.remove('open');
+            lid.classList.remove('closed');
+            
+            cookingStatus.textContent = "Pilih makanan untuk mulai memasak";
+            cookingStatus.style.color = "#f8c291";
+            
+            targetSecondsDisplay.textContent = "-";
+            
+            // Reset sound bars
+            initSoundBars();
+            
+            // Aktifkan tombol start, nonaktifkan tombol guess
+            startBtn.disabled = false;
+            startBtn.style.cursor = "pointer";
+            guessBtn.disabled = true;
+            guessBtn.style.cursor = "not-allowed";
+            
+            resultPanel.style.display = 'none';
+            
+            // Pilih makanan pertama
+            setTimeout(() => {
+                if (foods[0]) {
+                    selectFood(foods[0]);
+                }
+            }, 100);
+        }
+
+        // Toggle suara
+        soundToggle.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundToggle.innerHTML = soundEnabled ? 
+                '<i class="fas fa-volume-up"></i>' : 
+                '<i class="fas fa-volume-mute"></i>';
+            
+            soundToggle.style.backgroundColor = soundEnabled ? 
+                'rgba(255, 255, 255, 0.1)' : 
+                'rgba(229, 80, 57, 0.3)';
+        });
+
+        // Event listeners untuk tombol
+        startBtn.addEventListener('click', startCooking);
+        startBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startCooking();
+        });
+        
+        guessBtn.addEventListener('click', guessCooking);
+        guessBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            guessCooking();
+        });
+        
+        restartBtn.addEventListener('click', restartGame);
+        restartBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            restartGame();
+        });
+
+        // Inisialisasi game
+        initFoodOptions();
+        initSoundBars();
+        
+        // Pilih makanan pertama secara default
+        setTimeout(() => {
+            if (foods[0]) {
+                selectFood(foods[0]);
+            }
+        }, 100);
+    </script>
+</body>
+</html>
